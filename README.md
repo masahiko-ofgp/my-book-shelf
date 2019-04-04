@@ -33,3 +33,7 @@ This app use as follows.
     author: Bar
     publisher :Unknown
     isbn: 9784000000000
+
+## License
+
+Licensed under the LLGPL License.
