@@ -13,26 +13,31 @@ This app use as follows.
 - Clone this repository. 
 - Put in your `/.roswell/local-projects/`
 
-    $ ros run
+```
+$ ros run
 
-    * (ql:quickload :my-book-shelf)
-    * (in-package :my-book-shelf)
-    * (init-db)
+> (ql:quickload :my-book-shelf)
+> (in-package :my-book-shelf)
+> (init-db)
+```
 
 - `init-db` is function to create new `books.db` in current directory.
 
-    * (setf x (make-instance 'book :title "Foo" :author "Bar"))
-    * (add-book x)
-    * (show-all)
-    title: Foo
-    author: Bar
-    publisher: Unknown
-    isbn: 9784000000000
-    * (search-author "Bar")
-    title: Foo
-    author: Bar
-    publisher :Unknown
-    isbn: 9784000000000
+```    
+> (setf x (make-instance 'book :title "Foo" :author "Bar"))
+> (add-book x)
+> (show-all)
+title: Foo
+author: Bar
+publisher: Unknown
+isbn: 9784000000000
+
+> (search-author "Bar")
+title: Foo
+author: Bar
+publisher :Unknown
+isbn: 9784000000000
+```
 
 ## License
 
