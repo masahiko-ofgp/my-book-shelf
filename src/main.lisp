@@ -5,9 +5,13 @@
            :drop-tb
            :add-book
            :show-all
+           :search-title
            :search-author
+           :search-publisher
+           :search-isbn
            :book))
 (in-package :my-book-shelf)
+
 
 ;;; Create books.db.
 (defun init-db ()
@@ -16,10 +20,11 @@
           :database-name #p"books.db")
     (dbi:do-sql conn "CREATE TABLE books (\
     id INTEGER PRIMARY KEY AUTOINCREMENT, \
-    title VARCHAR(80), \
+    title VARCHAR(80) NOT NULL, \
     author VARCHAR(50), \
     publisher VARCAR(50), \
     isbn INTEGER)")))
+
 
 ;;; Drop table
 (defun drop-tb ()
@@ -27,6 +32,7 @@
     (conn :sqlite3
           :database-name #p"books.db")
     (dbi:do-sql conn "DROP TABLE books")))
+
 
 ;;; If you want to add new book,
 ;;; you must do make-instance 'book.
@@ -45,6 +51,7 @@
          :initform 9784000000000
          :accessor isbn)))
 
+
 ;;; Add new book data to database.
 (defun add-book (book)
   (with-slots (title author publisher isbn)
@@ -57,6 +64,7 @@
                                VALUES ('~a', '~a', '~a', '~a')" 
                                title author publisher isbn)))))
 
+
 ;;; Show all data.
 (defun show-all ()
   (dbi:with-connection
@@ -68,14 +76,52 @@
             while row
             do (format t "~{~a: ~a~%~}~%" row)))))
 
+
+;;; Search title
+(defun search-title (title-name)
+  (dbi:with-connection
+    (conn :sqlite3
+          :database-name #p"books.db")
+    (let* ((query (dbi:prepare conn "SELECT * FROM books WHERE title = ?"))
+           (result (dbi:execute query title-name)))
+      (loop for row = (dbi:fetch result)
+            while row
+            do (format t "~{~a: ~a~%~}~%" row)))))
+
+
+;;; Search author
 (defun search-author (author-name)
   (dbi:with-connection
     (conn :sqlite3
           :database-name #p"books.db")
-    (let* ((query (dbi:prepare conn 
-                               (format nil "SELECT * FROM books \
-                                       WHERE author='~a'" author-name)))
-           (result (dbi:execute query)))
+    (let* ((query (dbi:prepare conn "SELECT * FROM books WHERE author = ?"))
+           (result (dbi:execute query author-name)))
       (loop for row = (dbi:fetch result)
             while row
             do (format t "~{~a: ~a~%~}~%" row)))))
+
+
+;;; Search publisher
+(defun search-publisher (publisher-name)
+  (dbi:with-connection
+    (conn :sqlite3
+          :database-name #p"books.db")
+    (let* ((query (dbi:prepare conn "SELECT * FROM books WHERE publisher = ?"))
+           (result (dbi:execute query publisher-name)))
+      (loop for row = (dbi:fetch result)
+            while row
+            do (format t "~{~a: ~a~%~}~%" row)))))
+
+
+;;; Search ISBN
+(defun search-isbn (isbn-num)
+  (if (not (typep isbn-num 'integer))
+      (error "Not number")
+      (dbi:with-connection
+          (conn :sqlite3
+                :database-name #p"books.db")
+        (let* ((query (dbi:prepare conn "SELECT * FROM books WHERE isbn = ?"))
+               (result (dbi:execute query isbn-num)))
+          (loop for row = (dbi:fetch result)
+             while row
+             do (format t "~{~a: ~a~%~}~%" row))))))
