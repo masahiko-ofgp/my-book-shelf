@@ -5,10 +5,7 @@
            :drop-tb
            :add-book
            :show-all
-           :search-title
-           :search-author
-           :search-publisher
-           :search-isbn
+           :search-book
            :book))
 (in-package :my-book-shelf)
 
@@ -125,3 +122,12 @@
           (loop for row = (dbi:fetch result)
              while row
              do (format t "~{~a: ~a~%~}~%" row))))))
+
+;;; You can search by specifying the key(title, author, publisher, isbn)
+(defun search-book (key value)
+  (cond
+    ((string= key "title") (search-title value))
+    ((string= key "author") (search-author value))
+    ((string= key "publisher") (search-publisher value))
+    ((string= key "isbn") (search-isbn value))
+    (t (error "Not exist this key"))))
