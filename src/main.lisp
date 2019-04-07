@@ -46,7 +46,8 @@
               :accessor publisher)
    (isbn :initarg :isbn
          :initform 9784000000000
-         :accessor isbn)))
+         :accessor isbn
+         :documentation "ISBN is 13 digits. 9784xxxxxxxxx.")))
 
 
 ;;; Add new book data to database.
