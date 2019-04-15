@@ -16,8 +16,7 @@
     (conn :sqlite3
           :database-name #p"books.db")
     (dbi:do-sql conn "CREATE TABLE books (\
-    id INTEGER PRIMARY KEY AUTOINCREMENT, \
-    title VARCHAR(80) NOT NULL, \
+    title VARCHAR(80) PRIMARY KEY NOT NULL, \
     author VARCHAR(50), \
     publisher VARCAR(50), \
     isbn INTEGER)")))
@@ -61,7 +60,6 @@
                                (title, author, publisher, isbn) \
                                VALUES ('~a', '~a', '~a', '~a')" 
                                title author publisher isbn)))))
-
 
 ;;; Show all data.
 (defun show-all ()
