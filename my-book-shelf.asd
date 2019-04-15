@@ -2,7 +2,8 @@
   :version "0.1.0"
   :author "Masahiko Hamazawa"
   :license "LLGPL"
-  :depends-on (:cl-dbi)
+  :depends-on (:cl-dbi
+               :ltk)
   :components ((:module "src"
                 :components
                 ((:file "main"))))

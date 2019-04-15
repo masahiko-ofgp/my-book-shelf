@@ -1,12 +1,14 @@
 (defpackage my-book-shelf
   (:use :cl
-        :cl-dbi)
+        :cl-dbi
+        :ltk)
   (:export :init-db
            :drop-tb
            :add-book
            :show-all
            :search-book
-           :book))
+           :book
+           :gui-main))
 (in-package :my-book-shelf)
 
 
@@ -70,7 +72,7 @@
            (result (dbi:execute query)))
       (loop for row = (dbi:fetch result)
             while row
-            do (format t "~{~a: ~a~%~}~%" row)))))
+            do (format t "~{~A: ~A~%~}~%" row)))))
 
 
 ;;; Search title
@@ -79,10 +81,9 @@
     (conn :sqlite3
           :database-name #p"books.db")
     (let* ((query (dbi:prepare conn "SELECT * FROM books WHERE title = ?"))
-           (result (dbi:execute query title-name)))
-      (loop for row = (dbi:fetch result)
-            while row
-            do (format t "~{~a: ~a~%~}~%" row)))))
+           (result (dbi:execute query title-name))
+           (row (dbi:fetch result)))
+      (format nil "~{~A: ~A~%~}~%" row))))
 
 
 ;;; Search author
@@ -94,7 +95,7 @@
            (result (dbi:execute query author-name)))
       (loop for row = (dbi:fetch result)
             while row
-            do (format t "~{~a: ~a~%~}~%" row)))))
+            do (format t "~{~A: ~A~%~}~%" row)))))
 
 
 ;;; Search publisher
@@ -106,7 +107,7 @@
            (result (dbi:execute query publisher-name)))
       (loop for row = (dbi:fetch result)
             while row
-            do (format t "~{~a: ~a~%~}~%" row)))))
+            do (format t "~{~A: ~A~%~}~%" row)))))
 
 
 ;;; Search ISBN
@@ -117,16 +118,49 @@
           (conn :sqlite3
                 :database-name #p"books.db")
         (let* ((query (dbi:prepare conn "SELECT * FROM books WHERE isbn = ?"))
-               (result (dbi:execute query isbn-num)))
-          (loop for row = (dbi:fetch result)
-             while row
-             do (format t "~{~a: ~a~%~}~%" row))))))
+               (result (dbi:execute query isbn-num))
+               (row (dbi:fetch result)))
+          (format nil "~{~A: ~A~%~}~%" row)))))
+
 
 ;;; You can search by specifying the key(title, author, publisher, isbn)
 (defun search-book (key value)
   (cond
-    ((string= key "title") (search-title value))
+    ((string= key "title") (format t "~A~%" (search-title value)))
     ((string= key "author") (search-author value))
     ((string= key "publisher") (search-publisher value))
-    ((string= key "isbn") (search-isbn value))
+    ((string= key "isbn") (format t "~A~%" (search-isbn value)))
     (t (error "Not exist this key"))))
+
+
+;;; GUI mainloop
+(defun gui-main ()
+  (with-ltk ()
+    (wm-title *tk* "My Book Shelf")
+    (let* ((ent-f (make-instance 'frame))
+           (ent-label (make-instance 'label
+                                     :master ent-f
+                                     :text "Title"))
+           (ent (make-instance 'entry
+                               :master ent-f))
+           (res-label (make-instance 'label
+                                     :master nil))
+           (b1 (make-instance 'button
+                              :master ent-f
+                              :text "search"
+                              :command (lambda ()
+                                         (setf (text res-label)
+                                               (search-title (text ent))))))
+           (f (make-instance 'frame))
+           (exit-btn (make-instance 'button
+                                  :master f
+                                  :text "Exit"
+                                  :command (lambda ()
+                                             (setf *exit-mainloop* t)))))
+      (pack ent-f :side :top)
+      (pack ent-label :side :left)
+      (pack ent :side :left)
+      (pack b1 :side :left)
+      (pack res-label)
+      (pack f :side :bottom)
+      (pack exit-btn :side :left))))
