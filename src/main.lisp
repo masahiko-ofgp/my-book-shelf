@@ -6,7 +6,10 @@
            :drop-tb
            :add-book
            :show-all
-           :search-book
+           :search-title
+           :search-author
+           :search-publisher
+           :search-isbn
            :book
            :gui-main))
 (in-package :my-book-shelf)
@@ -123,14 +126,21 @@
           (format nil "~{~A: ~A~%~}~%" row)))))
 
 
-;;; You can search by specifying the key(title, author, publisher, isbn)
-(defun search-book (key value)
-  (cond
-    ((string= key "title") (format t "~A~%" (search-title value)))
-    ((string= key "author") (search-author value))
-    ((string= key "publisher") (search-publisher value))
-    ((string= key "isbn") (format t "~A~%" (search-isbn value)))
-    (t (error "Not exist this key"))))
+;;; Validate whether input-text is able to parse-integer.
+(defun check-parse-integer (text)
+  (let ((result nil))
+    (ignore-errors
+      (parse-integer text)
+      (setf result t))
+    (unless result)
+    result))
+
+
+;;; Helper function for GUI
+(defun search-title-or-isbn (book)
+  (if (check-parse-integer book)
+    (search-isbn (parse-integer book))
+    (search-title book)))
 
 
 ;;; GUI mainloop
@@ -140,7 +150,7 @@
     (let* ((ent-f (make-instance 'frame))
            (ent-label (make-instance 'label
                                      :master ent-f
-                                     :text "Title"))
+                                     :text "Title|ISBN"))
            (ent (make-instance 'entry
                                :master ent-f))
            (res-label (make-instance 'label
@@ -150,7 +160,7 @@
                               :text "search"
                               :command (lambda ()
                                          (setf (text res-label)
-                                               (search-title (text ent))))))
+                                               (search-title-or-isbn (text ent))))))
            (f (make-instance 'frame))
            (exit-btn (make-instance 'button
                                   :master f

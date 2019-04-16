@@ -33,7 +33,7 @@ author: Bar
 publisher: Unknown
 isbn: 9784000000000
 
-> (search-book "author" "Bar")
+> (search-author "Bar")
 title: Foo
 author: Bar
 publisher :Unknown

@@ -1,5 +1,5 @@
 (defsystem "my-book-shelf"
-  :version "0.1.0"
+  :version "0.2.1"
   :author "Masahiko Hamazawa"
   :license "LLGPL"
   :depends-on (:cl-dbi
